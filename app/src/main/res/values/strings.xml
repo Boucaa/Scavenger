@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">Scavenger</string>
+
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+    <string name="title_activity_zxing_orientation">ZXingOrientationActivity</string>
+    <string-array name="navigation_drawer_items">
+        <item>Scan</item>
+        <item>Your nodes</item>
+        <item>Help</item>
+    </string-array>
+
+</resources>
