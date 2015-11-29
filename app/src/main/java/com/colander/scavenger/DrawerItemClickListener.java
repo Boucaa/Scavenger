@@ -50,20 +50,20 @@ private AppCompatActivity parent;
             case 0:
                 fragment = new ScanFragment();
                 Bundle args = new Bundle();
-                //args.putInt(PlanetFragment.ARG_PLANET_NUMBER, position);
                 fragment.setArguments(args);
-                // Insert the fragment by replacing any existing fragment
                 manager.beginTransaction().replace(R.id.content_frame, fragment).commit();
                 break;
             case 1:
-                SupportMapFragment mapFragment = (SupportMapFragment)parent.getSupportFragmentManager().findFragmentById(R.id.map);
-                ((MapFragment)fragment).getMapAsync(this);
+                fragment = new MapFragment();
+                manager.beginTransaction().replace(R.id.content_frame, fragment).commit();
+                break;
+
         }
 
 
         // Highlight the selected item, update the title, and close the drawer
         mDrawerList.setItemChecked(position, true);
-        //TODO TITLE setTitle(mPlanetTitles[position]);
+        parent.setTitle(mPlanetTitles[position]);
 
         mDrawerLayout.closeDrawer(mDrawerList);
     }

@@ -6,9 +6,11 @@
     <string name="title_activity_zxing_orientation">ZXingOrientationActivity</string>
     <string-array name="navigation_drawer_items">
         <item>Scan</item>
-        <item>Your nodes</item>
-        <item>Help</item>
+        <item>Map</item>
+        <item>About</item>
     </string-array>
     <string name="title_activity_maps">Map</string>
+
+<!-- TODO: Remove or change this placeholder text -->
 
 </resources>
