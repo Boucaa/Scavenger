@@ -44,7 +44,7 @@ public class MainActivity extends AppCompatActivity {
         mDrawerList.setAdapter(new ArrayAdapter<String>(this,
                 R.layout.drawer_list_item, mPlanetTitles));
         // Set the list's click listener
-        mDrawerList.setOnItemClickListener(new DrawerItemClickListener(mPlanetTitles,mDrawerLayout,mDrawerList, getFragmentManager()));
+        mDrawerList.setOnItemClickListener(new DrawerItemClickListener(mPlanetTitles,mDrawerLayout,mDrawerList, getFragmentManager(),getSupportFragmentManager()));
         /*scanButton = (Button) findViewById(R.id.scan_button);
 
         final Activity main = this;
@@ -83,7 +83,9 @@ public class MainActivity extends AppCompatActivity {
         IntentResult scanningResult = IntentIntegrator.parseActivityResult(requestCode, resultCode, intent);
         if (scanningResult!=null){
             String scanContent = scanningResult.getContents();
-            text2.setText(scanContent);
+            System.out.println(scanContent);
+            TextView text = (TextView)findViewById(R.id.scanned_text);
+            text.setText(scanContent);
         }else{
             Toast toast = Toast.makeText(getApplicationContext(),
                     "No scan data received!", Toast.LENGTH_SHORT);

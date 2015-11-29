@@ -1,0 +1,21 @@
+<resources>
+    <!--
+    TODO: Before you run your application, you need a Google Maps API key.
+
+    To get one, follow this link, follow the directions and press "Create" at the end:
+
+    https://console.developers.google.com/flows/enableapi?apiid=maps_android_backend&keyType=CLIENT_SIDE_ANDROID&r=6D:AA:31:25:A2:D1:A3:4F:4A:24:69:C2:4B:96:71:0B:DD:5A:87:D5%3Bcom.colander.scavenger
+
+    You can also add your credentials to an existing key, using this line:
+    6D:AA:31:25:A2:D1:A3:4F:4A:24:69:C2:4B:96:71:0B:DD:5A:87:D5;com.colander.scavenger
+
+    Alternatively, follow the directions here:
+    https://developers.google.com/maps/documentation/android/start#get-key
+
+    Once you have your key (it starts with "AIza"), replace the "google_maps_key"
+    string in this file.
+    -->
+    <string name="google_maps_key" translatable="false" templateMergeStrategy="preserve">
+        AIzaSyAcUNW_Adi5Qr6-HJJbjPufCcgJ2-vl4ds
+    </string>
+</resources>
