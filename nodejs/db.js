@@ -1,3 +1,4 @@
+var mongo = require('mongodb')
 var MongoClient = require('mongodb').MongoClient
 var assert = require('assert')
 var ObjectId = require('mongodb').ObjectID
@@ -30,10 +31,9 @@ function nodesByUser(user, callback) {
 function nodeByID(id, callback) {
 	console.log("finding " + id)
 	nodes.find({
-		_id: id
+		_id: new mongo.ObjectID(id)
 	}).each(function(err, doc) {
 		if (doc != null) {
-			
 			console.dir(doc)
 			callback(err, doc)
 				//console.dir(doc)
@@ -41,21 +41,25 @@ function nodeByID(id, callback) {
 	})
 }
 
-function addUser(name, hash) {
+function addUser(name, hash, GID, mail) {
 	users.insert({
 		name: name,
 		hash: hash,
+		gID: GID,
+		mail: mail,
 		nodes: []
 	}, {}, function(err, doc) {
 		console.log("NEW USER: " + name)
 	})
 }
 
-function addNode(user, qr, links) {
+function addNode(user, qr, links, lat, lng) {
 	nodes.insert({
 		user: user,
 		qr: qr,
 		links: links,
+		lat: lat,
+		lng: lng,
 		visitors: []
 	}, {}, function(err, doc) {
 		if (err) {
@@ -90,25 +94,46 @@ function getUserID(user, callback) {
 	//console.dir(found[1])
 }
 
+function getMapNodes(callback) {
+	nodes.find().toArray(function(err, docs) {
+			callback(docs.map(function(doc) {
+				return {
+					lat: doc.lat,
+					lng: doc.lng,
+					id: doc._id
+				}
+			}))
+		})
+		/*.each(function(err, doc) {
+				if (doc != null) {
+					console.log(doc.lat)
+				}
+			})*/
+}
+
 MongoClient.connect("mongodb://localhost:27017/scavenger", function(err, database) {
 	db = database;
 	nodes = db.collection("nodes")
 	users = db.collection("users")
 	if (!err) {
 		console.log("Databese connected")
+		nodeByID("565b3a35074452f938336a1e", function(err, doc) {
+				console.dir(doc)
+			})
 			/*getUserID("testUser", function(err, name) {
 				console.log(name)
 			})*/
-		/*nodesByUser("testUser", function(err, docs) {
-				console.log("lel")
-				console.dir(docs)
+			/*nodesByUser("testUser", function(err, docs) {
+					console.log("lel")
+					console.dir(docs)
+				})*/
+			/*nodeByID("5655ce73d98bf50d15284cd4", function(err,doc){
+				console.dir(doc)
 			})*/
-nodeByID("5655ce73d98bf50d15284cd4", function(err,doc){
-	console.dir(doc)
-})
 			//nodesByUser("testUser")
-			//addNode("testUser", "testQR", [])
-			//	addUser("testUser","dawdaw")
+			//getMapNodes(console.dir)
+			//addNode("testUser", "testQR", [], 50.07554, 14.43780)
+			//	addUser("testUser","dawdaw","random idAWDAWD", "e.mail@email.com")
 			//var id = users.find()[1]
 			//console.dir(id)
 
@@ -121,3 +146,5 @@ nodeByID("5655ce73d98bf50d15284cd4", function(err,doc){
 		})*/
 	}
 })
+module.exports.getMapNodes = getMapNodes
+module.exports.nodeByID = nodeByID

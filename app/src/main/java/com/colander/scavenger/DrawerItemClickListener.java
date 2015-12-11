@@ -21,7 +21,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 /**
  * Created by colander on 11/28/15.
  */
-public class DrawerItemClickListener implements ListView.OnItemClickListener, OnMapReadyCallback {
+public class DrawerItemClickListener implements ListView.OnItemClickListener{
 
     FragmentManager manager;
     private String[] mPlanetTitles;
@@ -66,19 +66,5 @@ private AppCompatActivity parent;
         parent.setTitle(mPlanetTitles[position]);
 
         mDrawerLayout.closeDrawer(mDrawerList);
-    }
-
-    @Override
-    public void onMapReady(GoogleMap map) {
-
-        LatLng sydney = new LatLng(-33.867, 151.206);
-
-        map.setMyLocationEnabled(true);
-        map.moveCamera(CameraUpdateFactory.newLatLngZoom(sydney, 13));
-
-        map.addMarker(new MarkerOptions()
-                .title("Sydney")
-                .snippet("The most populous city in Australia.")
-                .position(sydney));
     }
 }
