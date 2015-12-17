@@ -5,7 +5,6 @@ var ObjectId = require('mongodb').ObjectID
 var db
 var nodes
 var users
-	// Connect to the db
 
 function nodesByUser(user, callback) {
 	users.find({
@@ -16,7 +15,6 @@ function nodesByUser(user, callback) {
 			for (var i = 0; i < doc.nodes.length; i++) {
 				console.dir(i + " " + doc.nodes[i])
 				nodeByID(doc.nodes[i], function(err, docum) {
-					//console.dir(docum)
 					console.log(i)
 					out[i] = docum
 					if (i == doc.nodes.length - 1) {
@@ -36,7 +34,6 @@ function nodeByID(id, callback) {
 		if (doc != null) {
 			console.dir(doc)
 			callback(err, doc)
-				//console.dir(doc)
 		}
 	})
 }
@@ -89,26 +86,18 @@ function getUserID(user, callback) {
 			callback(err, doc.name)
 		}
 	})
-
-	//return found
-	//console.dir(found[1])
 }
 
 function getMapNodes(callback) {
 	nodes.find().toArray(function(err, docs) {
-			callback(docs.map(function(doc) {
-				return {
-					lat: doc.lat,
-					lng: doc.lng,
-					id: doc._id
-				}
-			}))
-		})
-		/*.each(function(err, doc) {
-				if (doc != null) {
-					console.log(doc.lat)
-				}
-			})*/
+		callback(docs.map(function(doc) {
+			return {
+				lat: doc.lat,
+				lng: doc.lng,
+				id: doc._id
+			}
+		}))
+	})
 }
 
 MongoClient.connect("mongodb://localhost:27017/scavenger", function(err, database) {
@@ -136,14 +125,6 @@ MongoClient.connect("mongodb://localhost:27017/scavenger", function(err, databas
 			//	addUser("testUser","dawdaw","random idAWDAWD", "e.mail@email.com")
 			//var id = users.find()[1]
 			//console.dir(id)
-
-		/*var cursor = db.collection('nodes').find({
-		})
-		cursor.each(function(err, doc) {
-			if (doc != null) {
-				console.dir(doc)
-			}
-		})*/
 	}
 })
 module.exports.getMapNodes = getMapNodes

@@ -5,6 +5,7 @@ var fs = require('fs');
 var db = require("./db")
 var PDFDocument = require('pdfkit');
 var NEW_NODE_REQUEST = "/NEW_NODE/";
+var REGISTER_REQUEST = "/AUTH:";
 var nextID = 0;
 var TEST_REQUEST = "/TEST";
 var MAP_REQUEST = "/MAP"
@@ -43,12 +44,19 @@ http.createServer(function(request, response) {
 	} else if (request.url == "/SIGNIN") {
 		fs.readFile('login.html', "utf8", function(err, data) {
 			response.writeHead(200, {
-				'Content-Type': 'text/html'//,
-				//'Content-Length': data.length
+				'Content-Type': 'text/html' //,
+					//'Content-Length': data.length
 			});
 			response.write(data);
 			response.end();
 		});
+	} else if (request.url.substring(0, REGISTER_REQUEST.length) === REGISTER_REQUEST) {
+		var json = JSON.parse(request.url.substring(REGISTER_REQUEST.length))
+		response.writeHead(200, {
+			'Content-Type': 'text/plain'
+		})
+		response.end(JSON.stringify(json))
+		console.log(json)
 	} else if (request.url == MAP_REQUEST) {
 		response.writeHead(200, {
 			'Content-Type': 'text/plain'
