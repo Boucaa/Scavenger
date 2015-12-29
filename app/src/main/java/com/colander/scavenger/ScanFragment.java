@@ -22,7 +22,7 @@ import com.google.zxing.integration.android.IntentResult;
  * Use the {@link ScanFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class ScanFragment extends Fragment implements View.OnClickListener{
+public class ScanFragment extends android.support.v4.app.Fragment implements View.OnClickListener{
 
 
     /**

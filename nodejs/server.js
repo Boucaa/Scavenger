@@ -32,6 +32,7 @@ function read(address) {
 
 http.createServer(function(request, response) {
 	console.log(request.url)
+	console.dir(request)
 		//FAVICON
 	if (request.url == "/favicon.ico") {
 		response.writeHead(200, {

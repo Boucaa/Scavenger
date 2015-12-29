@@ -1,0 +1,51 @@
+{
+  "project_info": {
+    "project_id": "scavengerandroid",
+    "project_number": "25013689568",
+    "name": "ScavengerAndroid"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:25013689568:android:b7669077c7a3c25b",
+        "client_id": "android:com.colander.scavenger",
+        "client_type": 1,
+        "android_client_info": {
+          "package_name": "com.colander.scavenger"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "25013689568-i9oo11f2viq8coc94in8vo22m7b50g99.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.colander.scavenger",
+            "certificate_hash": "3886FEBD2A840885BAA4C4036221321892A91EA8"
+          }
+        }
+      ],
+      "api_key": [],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "cloud_messaging_service": {
+          "status": 1,
+          "apns_config": []
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "google_signin_service": {
+          "status": 2
+        },
+        "ads_service": {
+          "status": 1
+        }
+      }
+    }
+  ],
+  "client_info": [],
+  "ARTIFACT_VERSION": "1"
+}
