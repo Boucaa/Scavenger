@@ -6,8 +6,9 @@ import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
-import com.google.android.gms.maps.model.LatLng;
+import com.colander.scavenger.AccountContainer;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -46,30 +47,31 @@ public class RequestManager {
                 }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                //System.out.println("REQUEST ERROR "  + error.networkResponse.statusCode);
+                System.out.println("REQUEST ERRROR " + error.getMessage());
 
             }
         });
         queue.add(stringRequest);
     }
 
-    /*RequestQueue queue = Volley.newRequestQueue(this);
-    String url ="http://10.0.0.34:8081/TESTTTT";
-
-    // Request a string response from the provided URL.
-    StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
-            new Response.Listener<String>() {
-                @Override
-                public void onResponse(String response) {
-                    // Display the first 500 characters of the response string.
-                    //text2.setText("Server response is: " + response);
-                }
-            }, new Response.ErrorListener() {
-        @Override
-        public void onErrorResponse(VolleyError error) {
-            text2.setText("That didn't work!");
+    public <T extends JSONCallbackInterface> void claimNode(String id, final T callback) {
+        System.out.printf("SENTTTTTTTTTTTTTTTTT");
+        JSONObject request = new JSONObject();
+        try {
+            request.put("token", AccountContainer.getAccount().getIdToken());
+        } catch (JSONException e) {
+            e.printStackTrace();
         }
-    });
-    // Add the request to the RequestQueue.
-    queue.add(stringRequest);*/
+        queue.add(new JsonObjectRequest(serverIP, request, new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+                System.out.println("SUCCESSSSSSS");
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                System.out.println("REKT");
+            }
+        }));
+    }
 }

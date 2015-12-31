@@ -12,6 +12,10 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.android.volley.toolbox.Volley;
+import com.colander.scavenger.serverhandling.JSONCallbackInterface;
+import com.colander.scavenger.serverhandling.RequestManager;
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
@@ -25,9 +29,11 @@ import com.google.zxing.Result;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 
+import org.json.JSONObject;
+
 import me.dm7.barcodescanner.zxing.ZXingScannerView;
 
-public class MainActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener,  ZXingScannerView.ResultHandler{
+public class MainActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener, ZXingScannerView.ResultHandler, JSONCallbackInterface {
     TextView text2;
     Button scanButton;
 
@@ -42,45 +48,47 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        ZXingScannerView v = new ZXingScannerView(this);
-        setContentView(v);
-        v.startCamera();
-        //setContentView(R.layout.activity_main);
-        /*drawerItemNames = getResources().getStringArray(R.array.navigation_drawer_items);
+        setContentView(R.layout.activity_main);
+        drawerItemNames = getResources().getStringArray(R.array.navigation_drawer_items);
         drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawerList = (ListView) findViewById(R.id.left_drawer);
         drawerList.setAdapter(new ArrayAdapter<String>(this, R.layout.drawer_list_item, drawerItemNames));
         drawerList.setOnItemClickListener(new DrawerItemClickListener(drawerItemNames, drawerLayout, drawerList, getFragmentManager(), this));
-*/
+
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestEmail()
+                .requestIdToken(getString(R.string.server_client_id))
                 .build();
         mGoogleApiClient = new GoogleApiClient.Builder(this)
                 .enableAutoManage(this /* FragmentActivity */, this /* OnConnectionFailedListener */)
                 .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
                 .build();
         signIn();
+
     }
 
     public void onActivityResult(int requestCode, int resultCode, Intent intent) {
-        if(requestCode == RC_SIGN_IN){
+        if (requestCode == RC_SIGN_IN) {
             GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(intent);
-            if((userAccount = result.getSignInAccount())!= null){
-            System.out.println("hard login successful");}
-            else{
+            if (result.getSignInAccount() != null) {
+                AccountContainer.setAccount(result.getSignInAccount());
+                System.out.println("hard login successful");
+                onSuccessfulLogin();
+            } else {
                 signIn();
             }
-        }else{
-        IntentResult scanningResult = IntentIntegrator.parseActivityResult(requestCode, resultCode, intent);
-        if (scanningResult!=null){
-            String scanContent = scanningResult.getContents();
-            TextView text = (TextView)findViewById(R.id.scanned_text);
-            text.setText(scanContent);
-        }else{
-            Toast toast = Toast.makeText(getApplicationContext(),
-                    "No scan data received!", Toast.LENGTH_SHORT);
-            toast.show();
-        }}
+        } else {
+            IntentResult scanningResult = IntentIntegrator.parseActivityResult(requestCode, resultCode, intent);
+            if (scanningResult != null) {
+                String scanContent = scanningResult.getContents();
+                TextView text = (TextView) findViewById(R.id.scanned_text);
+                text.setText(scanContent);
+            } else {
+                Toast toast = Toast.makeText(getApplicationContext(),
+                        "No scan data received!", Toast.LENGTH_SHORT);
+                toast.show();
+            }
+        }
     }
 
     @Override
@@ -93,30 +101,33 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
         OptionalPendingResult<GoogleSignInResult> pendingResult = Auth.GoogleSignInApi.silentSignIn(mGoogleApiClient);
         if (pendingResult.isDone()) {
             System.out.println("silent login successful");
-            userAccount = pendingResult.get().getSignInAccount();
+            AccountContainer.setAccount(pendingResult.get().getSignInAccount());
+            onSuccessfulLogin();
         } else {
             pendingResult.setResultCallback(new ResultCallback<GoogleSignInResult>() {
                 @Override
                 public void onResult(GoogleSignInResult result) {
-                    if(result.getSignInAccount()== null){
+                    if (result.getSignInAccount() == null) {
                         Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
                         startActivityForResult(signInIntent, RC_SIGN_IN);
-                    }else{
-                    System.out.println("silent login successful");
-                    userAccount = result.getSignInAccount();
+                    } else {
+                        System.out.println("silent login successful");
+                        AccountContainer.setAccount(result.getSignInAccount());
+                        onSuccessfulLogin();
                     }
                 }
             });
         }
     }
 
-    public void signOut(){
+    public void signOut() {
         Auth.GoogleSignInApi.signOut(mGoogleApiClient).setResultCallback(
                 new ResultCallback<Status>() {
                     @Override
                     public void onResult(Status status) {
-                        if(status.isSuccess()){
+                        if (status.isSuccess()) {
                             userAccount = null;
+                            signIn();
                         }
                     }
                 });
@@ -141,5 +152,15 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
     @Override
     public void handleResult(Result result) {
 
+    }
+
+    public void onSuccessfulLogin(){
+        System.out.println(AccountContainer.getAccount().getEmail());
+        new RequestManager(Volley.newRequestQueue(this)).claimNode("random id",this);
+    }
+
+    @Override
+    public void onJSONResponse(JSONObject obj) {
+        System.out.println(obj.toString());
     }
 }

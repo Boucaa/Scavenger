@@ -13,8 +13,6 @@
     <string name="title_activity_maps">Map</string>
     <string name="server_client_id">25013689568-5p2g0ett1o784rddou1qpcnjgae5f8l8.apps.googleusercontent.com</string>
     <string name="title_activity_sign_in">SignInActivity</string>
-
-
-    <!-- TODO: Remove or change this placeholder text -->
+    <string name="title_activity_scan">ScanActivity</string>
 
 </resources>

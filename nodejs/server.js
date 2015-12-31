@@ -2,7 +2,9 @@ var http = require("http");
 var request = require('request');
 var httpg = require('http-get');
 var fs = require('fs');
+var url = require('url');
 var db = require("./db")
+var validator = require("./validator")
 var PDFDocument = require('pdfkit');
 var NEW_NODE_REQUEST = "/NEW_NODE/";
 var REGISTER_REQUEST = "/AUTH:";
@@ -32,8 +34,19 @@ function read(address) {
 
 http.createServer(function(request, response) {
 	console.log(request.url)
-	console.dir(request)
-		//FAVICON
+	var data = ""
+	if (request.method == "POST") {
+		request.on("data", function(chunk) {
+			//console.log(chunk.toString())
+			data += chunk
+		})
+		request.on("end",function(){
+			var jsonData = JSON.parse(data)
+			validator.validate(jsonData.token)
+		})
+	}
+
+	//FAVICON
 	if (request.url == "/favicon.ico") {
 		response.writeHead(200, {
 			'Content-Type': 'image/x-icon'
