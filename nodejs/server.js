@@ -40,9 +40,19 @@ http.createServer(function(request, response) {
 			//console.log(chunk.toString())
 			data += chunk
 		})
-		request.on("end",function(){
+		request.on("end", function() {
 			var jsonData = JSON.parse(data)
-			validator.validate(jsonData.token)
+			if (jsonData.token != undefined) {
+				validator.validate(jsonData.token, function(json) {
+
+				})
+
+				validator.validate(jsonData.token, function(json) {
+
+				})
+			} else {
+				console.log("POST request didn't contain auth token, request: \n" + request.url + "\n" + "data")
+			}
 		})
 	}
 

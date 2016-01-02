@@ -38,26 +38,26 @@ function nodeByID(id, callback) {
 	})
 }
 
-function addUser(name, hash, GID, mail) {
+function addUser(name, hash, GID, email) {
 	users.insert({
 		name: name,
 		hash: hash,
 		gID: GID,
-		mail: mail,
+		email: mail,
 		nodes: []
 	}, {}, function(err, doc) {
 		console.log("NEW USER: " + name)
 	})
 }
 
-function addNode(user, qr, links, lat, lng) {
+function addNode(user, qr, lat, lng) {
 	nodes.insert({
-		user: user,
-		qr: qr,
-		links: links,
-		lat: lat,
-		lng: lng,
-		visitors: []
+		user: user, //founder of the node
+		qr: qr, //the confirmation QR code
+		lat: lat, //location lat
+		lng: lng, //location lng
+		owner: null, //current owner
+		lastClaim: new Date().getMilliseconds-86400000 //now minus 1 day
 	}, {}, function(err, doc) {
 		if (err) {
 			console.log(err)
@@ -73,6 +73,8 @@ function addNode(user, qr, links, lat, lng) {
 		}
 	})
 }
+
+function claimNode()
 
 function checkUser(name) {
 	//TODO: Check if the user already exists when creating a new user

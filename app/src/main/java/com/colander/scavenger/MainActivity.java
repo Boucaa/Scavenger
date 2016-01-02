@@ -64,7 +64,6 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
                 .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
                 .build();
         signIn();
-
     }
 
     public void onActivityResult(int requestCode, int resultCode, Intent intent) {
@@ -156,7 +155,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
 
     public void onSuccessfulLogin(){
         System.out.println(AccountContainer.getAccount().getEmail());
-        new RequestManager(Volley.newRequestQueue(this)).claimNode("random id",this);
+        //new RequestManager(Volley.newRequestQueue(this)).claimNode("random id",this);
     }
 
     @Override
