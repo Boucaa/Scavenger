@@ -18,7 +18,7 @@ import org.json.JSONObject;
  * Created by colander on 11/29/15.
  */
 public class RequestManager {
-    private String serverIP = "http://10.0.0.39:8081/";
+    private String serverIP = "http://10.0.0.38:8081/";
     private String mapRequest = "MAP";
     private RequestQueue queue;
     public final static int NODES_ID = 1;

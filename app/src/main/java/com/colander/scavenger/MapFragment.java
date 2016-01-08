@@ -8,24 +8,31 @@ import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.app.Fragment;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
+import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.Volley;
 import com.colander.scavenger.serverhandling.JSONArrayCallbackInterface;
 import com.colander.scavenger.serverhandling.RequestManager;
+import com.flipboard.bottomsheet.BottomSheetLayout;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.xml.sax.helpers.LocatorImpl;
 
 
 /**
@@ -42,9 +49,10 @@ public class MapFragment extends android.support.v4.app.Fragment implements OnMa
     private LocationManager locationManager;
     private JSONArray nodes;
     private final String NODES_KEY = "nodes";
-    private final int MIN_TIME = 500;
-    private final int MIN_DISTANCE = 10;
     private OnFragmentInteractionListener mListener;
+    private BottomSheetLayout bottomSheet;
+    private ImageLoader mImageLoader;
+    private String currentNode = "";
 
     public static MapFragment newInstance(String param1, String param2) {
         MapFragment fragment = new MapFragment();
@@ -66,9 +74,12 @@ public class MapFragment extends android.support.v4.app.Fragment implements OnMa
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
         View view = inflater.inflate(R.layout.fragment_map, container, false);
+        ((SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map)).getMapAsync(this);
+        ImageLoader.ImageCache imageCache = new BitmapLruCache();
+        mImageLoader = new ImageLoader(Volley.newRequestQueue(getContext()), imageCache);
         if (this.requestManager == null) setUpRequestManager();
         locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
-        locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,MIN_TIME,MIN_DISTANCE, this);
+        //locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,MIN_TIME,MIN_DISTANCE, this);
         if (savedInstanceState != null) {
             if (savedInstanceState.containsKey(NODES_KEY)) {
                 System.out.println("RESTORING NODES");
@@ -82,7 +93,9 @@ public class MapFragment extends android.support.v4.app.Fragment implements OnMa
                 requestManager.getAllNodesJSON(this);
             }
         }
-        ((SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map)).getMapAsync(this);
+        bottomSheet = (BottomSheetLayout) view;
+        bottomSheet.setShouldDimContentView(false);
+        bottomSheet.setInterceptContentTouch(false);
         return view;
     }
 
@@ -102,9 +115,43 @@ public class MapFragment extends android.support.v4.app.Fragment implements OnMa
         System.out.println("MAP READY");
         this.mMap = googleMap;
         mMap.setMyLocationEnabled(true);
-        mMap.addMarker(new MarkerOptions().title("fake node").position(new LatLng(50, 14)));
-        if(nodes ==null)this.requestManager.getAllNodesJSON(this);
+        if (nodes == null) this.requestManager.getAllNodesJSON(this);
         else displayNodes();
+        Location location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+        LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
+        CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(latLng, 15);
+        mMap.animateCamera(cameraUpdate);
+        mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+            @Override
+            public boolean onMarkerClick(Marker marker) {
+                showNode(marker);
+                return true;
+            }
+        });
+    }
+
+    public void showNode(Marker marker) {
+        for (int i = 0; i < nodes.length(); i++) {
+            try {
+                JSONObject obj = nodes.getJSONObject(i);
+                if (marker.getId().equals(obj.getString("markerID"))) {
+                    if (obj.getString("id").equals(this.currentNode)) return;
+                    if (!bottomSheet.isSheetShowing()) {
+                        bottomSheet.showWithSheetView(LayoutInflater.from(getContext()).inflate(R.layout.content_node, bottomSheet, false));
+                    }
+                    RecyclerView recyclerView = (RecyclerView) getActivity().findViewById(R.id.node_images);
+                    recyclerView.setHasFixedSize(true);
+                    recyclerView.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
+                    recyclerView.setAdapter(new NodeImgRecyclerAdapter(new String[]{"kek", "lel", "topkek", " adw", "L", " ", "AWD", " awdawda", "ls", "cd"}, mImageLoader, getContext()));
+                    ((TextView) getActivity().findViewById(R.id.node_headline)).setText(obj.getString("headline"));
+                    ((TextView) getActivity().findViewById(R.id.node_description)).setText(obj.getString("description"));
+                    this.currentNode = obj.getString("id");
+                    break;
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     /*@Override
@@ -122,7 +169,8 @@ public class MapFragment extends android.support.v4.app.Fragment implements OnMa
         for (int i = 0; i < nodes.length(); i++) {
             try {
                 JSONObject object = nodes.getJSONObject(i);
-                this.mMap.addMarker(new MarkerOptions().title("a node! :)").position(new LatLng(object.getDouble("lat"), object.getDouble("lng"))));
+                Marker marker = this.mMap.addMarker(new MarkerOptions().title("a node! :)").position(new LatLng(object.getDouble("lat"), object.getDouble("lng"))));
+                object.put("markerID", marker.getId());
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -131,7 +179,7 @@ public class MapFragment extends android.support.v4.app.Fragment implements OnMa
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
-        if(nodes != null) outState.putString(NODES_KEY, nodes.toString());
+        if (nodes != null) outState.putString(NODES_KEY, nodes.toString());
         super.onSaveInstanceState(outState);
     }
 

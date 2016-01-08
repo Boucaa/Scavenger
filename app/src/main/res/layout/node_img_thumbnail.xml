@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.android.volley.toolbox.NetworkImageView
+    android:id="@+id/thumbnail"
+    android:layout_height="match_parent"
+    android:layout_width="wrap_content"
+    android:layout_marginRight="5dp"
+    android:adjustViewBounds="true"
+    xmlns:android="http://schemas.android.com/apk/res/android" />
+    <!--netušim, co to poslední dělá, ale funguje to :) -->

@@ -50,19 +50,20 @@ function addUser(name, hash, GID, email) {
 	})
 }
 
-function addNode(user, qr, lat, lng) {
+function addNode(user, qr, lat, lng, headline, description) {
 	nodes.insert({
 		user: user, //founder of the node
 		qr: qr, //the confirmation QR code
 		lat: lat, //location lat
 		lng: lng, //location lng
-		owner: null, //current owner
-		lastClaim: new Date().getMilliseconds-86400000 //now minus 1 day
+		visitors: [],
+		headline: headline,
+		description: description
 	}, {}, function(err, doc) {
 		if (err) {
 			console.log(err)
 		} else {
-			console.log("NEW NODE: user: " + user + " qr: " + qr)
+			console.log("NEW NODE: user: " + user + " qr: " + qr + " headline: " + headline)
 			users.update({
 				"name": user
 			}, {
@@ -74,7 +75,7 @@ function addNode(user, qr, lat, lng) {
 	})
 }
 
-function claimNode()
+function claimNode() {}
 
 function checkUser(name) {
 	//TODO: Check if the user already exists when creating a new user
@@ -94,6 +95,8 @@ function getMapNodes(callback) {
 	nodes.find().toArray(function(err, docs) {
 		callback(docs.map(function(doc) {
 			return {
+				headline: doc.headline,
+				description: doc.description,
 				lat: doc.lat,
 				lng: doc.lng,
 				id: doc._id
@@ -108,9 +111,9 @@ MongoClient.connect("mongodb://localhost:27017/scavenger", function(err, databas
 	users = db.collection("users")
 	if (!err) {
 		console.log("Databese connected")
-		nodeByID("565b3a35074452f938336a1e", function(err, doc) {
-				console.dir(doc)
-			})
+			/*nodeByID("565b3a35074452f938336a1e", function(err, doc) {
+					console.dir(doc)
+				})*/
 			/*getUserID("testUser", function(err, name) {
 				console.log(name)
 			})*/
@@ -123,10 +126,16 @@ MongoClient.connect("mongodb://localhost:27017/scavenger", function(err, databas
 			})*/
 			//nodesByUser("testUser")
 			//getMapNodes(console.dir)
-			//addNode("testUser", "testQR", [], 50.07554, 14.43780)
-			//	addUser("testUser","dawdaw","random idAWDAWD", "e.mail@email.com")
-			//var id = users.find()[1]
-			//console.dir(id)
+
+
+		//add node: user, qr, lat, lng, headline, description
+		//addNode("testUser", "testQR", 50.08414, 14.40835, "Mimina na kampě", "Nějaký supr dupr popis mimin na kampě, určitě bych doporučil všem :).")
+
+		//	addUser("testUser","dawdaw","random idAWDAWD", "e.mail@email.com")
+
+
+		//var id = users.find()[1]
+		//console.dir(id)
 	}
 })
 module.exports.getMapNodes = getMapNodes

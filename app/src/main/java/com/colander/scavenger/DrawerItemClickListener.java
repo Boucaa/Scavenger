@@ -34,6 +34,7 @@ public class DrawerItemClickListener implements ListView.OnItemClickListener {
         this.mDrawerList = mDrawerList;
         this.parent = parent;
         this.fragments = new Fragment[mDrawerNames.length];
+        selectItem(1);
     }
 
     public void selectItem(int position) {
