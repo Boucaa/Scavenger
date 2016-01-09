@@ -129,7 +129,7 @@ MongoClient.connect("mongodb://localhost:27017/scavenger", function(err, databas
 
 
 		//add node: user, qr, lat, lng, headline, description
-		//addNode("testUser", "testQR", 50.08414, 14.40835, "Mimina na kampě", "Nějaký supr dupr popis mimin na kampě, určitě bych doporučil všem :).")
+		//addNode("testUser", "testQR", 50.08414, 14.40835, "Mimina na kampě", "Nějaký supr dupr popis mimin na kampě, určitě bych doporučil všem :). Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. ")
 
 		//	addUser("testUser","dawdaw","random idAWDAWD", "e.mail@email.com")
 

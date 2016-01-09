@@ -6,13 +6,16 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.android.volley.toolbox.ImageLoader;
@@ -20,6 +23,7 @@ import com.android.volley.toolbox.Volley;
 import com.colander.scavenger.serverhandling.JSONArrayCallbackInterface;
 import com.colander.scavenger.serverhandling.RequestManager;
 import com.flipboard.bottomsheet.BottomSheetLayout;
+import com.flipboard.bottomsheet.OnSheetDismissedListener;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -32,7 +36,6 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.xml.sax.helpers.LocatorImpl;
 
 
 /**
@@ -53,8 +56,9 @@ public class MapFragment extends android.support.v4.app.Fragment implements OnMa
     private BottomSheetLayout bottomSheet;
     private ImageLoader mImageLoader;
     private String currentNode = "";
+    private View shadow;
 
-    public static MapFragment newInstance(String param1, String param2) {
+    public static MapFragment newInstance() {
         MapFragment fragment = new MapFragment();
         return fragment;
     }
@@ -79,7 +83,6 @@ public class MapFragment extends android.support.v4.app.Fragment implements OnMa
         mImageLoader = new ImageLoader(Volley.newRequestQueue(getContext()), imageCache);
         if (this.requestManager == null) setUpRequestManager();
         locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
-        //locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,MIN_TIME,MIN_DISTANCE, this);
         if (savedInstanceState != null) {
             if (savedInstanceState.containsKey(NODES_KEY)) {
                 System.out.println("RESTORING NODES");
@@ -138,6 +141,33 @@ public class MapFragment extends android.support.v4.app.Fragment implements OnMa
                     if (obj.getString("id").equals(this.currentNode)) return;
                     if (!bottomSheet.isSheetShowing()) {
                         bottomSheet.showWithSheetView(LayoutInflater.from(getContext()).inflate(R.layout.content_node, bottomSheet, false));
+                        bottomSheet.addOnSheetDismissedListener(new OnSheetDismissedListener() {
+                            @Override
+                            public void onDismissed(BottomSheetLayout bottomSheetLayout) {
+                                currentNode = "";
+                            }
+                        });
+                        shadow = getActivity().findViewById(R.id.toolbar_shadow);
+                        bottomSheet.addOnSheetStateChangeListener(new BottomSheetLayout.OnSheetStateChangeListener() {
+                            @Override
+                            public void onSheetStateChanged(BottomSheetLayout.State state) {
+                                if (state == BottomSheetLayout.State.EXPANDED) {
+                                    shadow.setBackground(ContextCompat.getDrawable(getContext(), R.drawable.solid_shadow));
+                                    if (Build.VERSION.SDK_INT >= 21)
+                                        getActivity().getActionBar().setElevation(0);
+                                } else {
+                                    shadow.setBackground(ContextCompat.getDrawable(getContext(), R.drawable.toolbar_dropshadow));
+                                    if (Build.VERSION.SDK_INT >= 21)
+                                        getActivity().getActionBar().setElevation(4);
+                                }
+                            }
+                        });
+                        ((ImageButton)getActivity().findViewById(R.id.hide_node_button)).setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                bottomSheet.dismissSheet();
+                            }
+                        });
                     }
                     RecyclerView recyclerView = (RecyclerView) getActivity().findViewById(R.id.node_images);
                     recyclerView.setHasFixedSize(true);
