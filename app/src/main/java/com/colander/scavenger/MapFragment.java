@@ -162,7 +162,7 @@ public class MapFragment extends android.support.v4.app.Fragment implements OnMa
                                 }
                             }
                         });
-                        ((ImageButton)getActivity().findViewById(R.id.hide_node_button)).setOnClickListener(new View.OnClickListener() {
+                        (getActivity().findViewById(R.id.hide_node_button)).setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
                                 bottomSheet.dismissSheet();
@@ -183,13 +183,6 @@ public class MapFragment extends android.support.v4.app.Fragment implements OnMa
             }
         }
     }
-
-    /*@Override
-    public void onPairResponse(Pair<Double, Double>[] pairs) {
-        for (int i = 0; i < pairs.length; i++) {
-            this.mMap.addMarker(new MarkerOptions().title("a loaded node!").position(new LatLng(pairs[i].first, pairs[i].second)));
-        }
-    }*/
 
     public void setUpRequestManager() {
         this.requestManager = new RequestManager(Volley.newRequestQueue(getActivity()));

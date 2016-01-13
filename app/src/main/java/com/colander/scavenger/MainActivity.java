@@ -33,9 +33,7 @@ import org.json.JSONObject;
 
 import me.dm7.barcodescanner.zxing.ZXingScannerView;
 
-public class MainActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener, ZXingScannerView.ResultHandler, JSONCallbackInterface {
-    TextView text2;
-    Button scanButton;
+public class MainActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener, ZXingScannerView.ResultHandler{
 
     private String[] drawerItemNames;
     private DrawerLayout drawerLayout;
@@ -52,7 +50,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
         drawerItemNames = getResources().getStringArray(R.array.navigation_drawer_items);
         drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawerList = (ListView) findViewById(R.id.left_drawer);
-        drawerList.setAdapter(new ArrayAdapter<String>(this, R.layout.drawer_list_item, drawerItemNames));
+        drawerList.setAdapter(new ArrayAdapter(this, R.layout.drawer_list_item, drawerItemNames));
         drawerList.setOnItemClickListener(new DrawerItemClickListener(drawerItemNames, drawerLayout, drawerList, getFragmentManager(), this));
 
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
@@ -60,7 +58,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
                 .requestIdToken(getString(R.string.server_client_id))
                 .build();
         mGoogleApiClient = new GoogleApiClient.Builder(this)
-                .enableAutoManage(this /* FragmentActivity */, this /* OnConnectionFailedListener */)
+                .enableAutoManage(this, this)
                 .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
                 .build();
         signIn();
@@ -134,7 +132,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
 
     @Override
     public void onConnectionFailed(ConnectionResult connectionResult) {
-
+        System.out.println("API CONNECTION FAILED");
     }
 
     @Override
@@ -154,12 +152,6 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
     }
 
     public void onSuccessfulLogin(){
-        System.out.println(AccountContainer.getAccount().getEmail());
-        //new RequestManager(Volley.newRequestQueue(this)).claimNode("random id",this);
-    }
-
-    @Override
-    public void onJSONResponse(JSONObject obj) {
-        System.out.println(obj.toString());
+        System.out.println("LOGIN SUCCESSFUL");
     }
 }

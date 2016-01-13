@@ -26,18 +26,6 @@ function nodesByUser(user, callback) {
 	})
 }
 
-function nodeByID(id, callback) {
-	console.log("finding " + id)
-	nodes.find({
-		_id: new mongo.ObjectID(id)
-	}).each(function(err, doc) {
-		if (doc != null) {
-			console.dir(doc)
-			callback(err, doc)
-		}
-	})
-}
-
 function addUser(name, hash, GID, email) {
 	users.insert({
 		name: name,
@@ -75,10 +63,14 @@ function addNode(user, qr, lat, lng, headline, description) {
 	})
 }
 
-function claimNode() {}
+function claimNode(user, qr, node) {
 
-function checkUser(name) {
-	//TODO: Check if the user already exists when creating a new user
+}
+
+function getNodeByID(id,callback){//NOVE
+	nodes.findOne({_id:new mongo.ObjectID(id)},function(err,doc){
+		callback(doc)
+	})
 }
 
 function getUserID(user, callback) {
@@ -111,23 +103,10 @@ MongoClient.connect("mongodb://localhost:27017/scavenger", function(err, databas
 	users = db.collection("users")
 	if (!err) {
 		console.log("Databese connected")
-			/*nodeByID("565b3a35074452f938336a1e", function(err, doc) {
-					console.dir(doc)
-				})*/
-			/*getUserID("testUser", function(err, name) {
-				console.log(name)
-			})*/
-			/*nodesByUser("testUser", function(err, docs) {
-					console.log("lel")
-					console.dir(docs)
-				})*/
-			/*nodeByID("5655ce73d98bf50d15284cd4", function(err,doc){
-				console.dir(doc)
-			})*/
-			//nodesByUser("testUser")
-			//getMapNodes(console.dir)
 
-
+		getNodeByID("569138a0b2d4854947c48bd1",function(doc){
+			console.dir(doc)
+		})
 		//add node: user, qr, lat, lng, headline, description
 		//addNode("testUser", "testQR", 50.08414, 14.40835, "Mimina na kampě", "Nějaký supr dupr popis mimin na kampě, určitě bych doporučil všem :). Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. ")
 

@@ -18,7 +18,7 @@ import org.json.JSONObject;
  * Created by colander on 11/29/15.
  */
 public class RequestManager {
-    private String serverIP = "http://10.0.0.38:8081/";
+    private String serverIP = "http://192.168.24.236:8081/";
     private String mapRequest = "MAP";
     private RequestQueue queue;
     public final static int NODES_ID = 1;
@@ -48,7 +48,7 @@ public class RequestManager {
                 }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                System.out.println("REQUEST ERRROR " + error.getMessage());
+                System.out.println("REQUEST ERROR " + error.getMessage());
 
             }
         });
@@ -71,7 +71,7 @@ public class RequestManager {
                 }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                System.out.println("REQUEST ERRROR " + error.getMessage());
+                System.out.println("REQUEST ERROR " + error.getMessage());
 
             }
         });

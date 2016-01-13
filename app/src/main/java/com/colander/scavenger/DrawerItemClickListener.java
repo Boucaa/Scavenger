@@ -17,7 +17,6 @@ public class DrawerItemClickListener implements ListView.OnItemClickListener {
     private String[] mDrawerNames;
     private DrawerLayout mDrawerLayout;
     private ListView mDrawerList;
-    private android.support.v4.app.FragmentManager sup;
     private AppCompatActivity parent;
     private Fragment[] fragments;
 
@@ -38,7 +37,6 @@ public class DrawerItemClickListener implements ListView.OnItemClickListener {
     }
 
     public void selectItem(int position) {
-        Fragment fragment = null;
         if (fragments[position] == null) {
             switch (position) {
                 case 0:
