@@ -52,23 +52,30 @@ function addNode(user, qr, lat, lng, headline, description) {
 			console.log(err)
 		} else {
 			console.log("NEW NODE: user: " + user + " qr: " + qr + " headline: " + headline)
-			users.update({
-				"name": user
-			}, {
-				"$push": {
-					"nodes": doc.ops[0]._id
-				}
-			})
 		}
 	})
 }
 
-function claimNode(user, qr, node) {
-
+function claimNode(user, qr, nodeID, callback) {
+	var node = getNodeByID(nodeID, function(doc) {
+		if (doc.qr == qr) {
+			console.log("QR OK")
+			users.update({
+				"name": user
+			}, {
+				"$push": {
+					"nodes": nodeID
+				}
+			})
+			callback("success")
+		}
+	})
 }
 
-function getNodeByID(id,callback){//NOVE
-	nodes.findOne({_id:new mongo.ObjectID(id)},function(err,doc){
+function getNodeByID(id, callback) { //NOVE
+	nodes.findOne({
+		_id: new mongo.ObjectID(id)
+	}, function(err, doc) {
 		callback(doc)
 	})
 }
@@ -104,11 +111,11 @@ MongoClient.connect("mongodb://localhost:27017/scavenger", function(err, databas
 	if (!err) {
 		console.log("Databese connected")
 
-		getNodeByID("569138a0b2d4854947c48bd1",function(doc){
-			console.dir(doc)
-		})
-		//add node: user, qr, lat, lng, headline, description
-		//addNode("testUser", "testQR", 50.08414, 14.40835, "Mimina na kampě", "Nějaký supr dupr popis mimin na kampě, určitě bych doporučil všem :). Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. ")
+		getNodeByID("569138a0b2d4854947c48bd1", function(doc) {
+				console.dir(doc)
+			})
+			//add node: user, qr, lat, lng, headline, description
+			//addNode("testUser", "testQR", 50.08414, 14.40835, "Mimina na kampě", "Nějaký supr dupr popis mimin na kampě, určitě bych doporučil všem :). Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. ")
 
 		//	addUser("testUser","dawdaw","random idAWDAWD", "e.mail@email.com")
 
@@ -118,4 +125,5 @@ MongoClient.connect("mongodb://localhost:27017/scavenger", function(err, databas
 	}
 })
 module.exports.getMapNodes = getMapNodes
-module.exports.nodeByID = nodeByID
+module.exports.getNodeByID = getNodeByID
+module.exports.claimNode = claimNode

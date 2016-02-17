@@ -2,6 +2,7 @@ package com.colander.scavenger;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -9,18 +10,19 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.app.Fragment;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.Volley;
 import com.colander.scavenger.serverhandling.JSONArrayCallbackInterface;
+import com.colander.scavenger.serverhandling.JSONCallbackInterface;
 import com.colander.scavenger.serverhandling.RequestManager;
 import com.flipboard.bottomsheet.BottomSheetLayout;
 import com.flipboard.bottomsheet.OnSheetDismissedListener;
@@ -136,7 +138,7 @@ public class MapFragment extends android.support.v4.app.Fragment implements OnMa
     public void showNode(Marker marker) {
         for (int i = 0; i < nodes.length(); i++) {
             try {
-                JSONObject obj = nodes.getJSONObject(i);
+                final JSONObject obj = nodes.getJSONObject(i);
                 if (marker.getId().equals(obj.getString("markerID"))) {
                     if (obj.getString("id").equals(this.currentNode)) return;
                     if (!bottomSheet.isSheetShowing()) {
@@ -176,12 +178,35 @@ public class MapFragment extends android.support.v4.app.Fragment implements OnMa
                     ((TextView) getActivity().findViewById(R.id.node_headline)).setText(obj.getString("headline"));
                     ((TextView) getActivity().findViewById(R.id.node_description)).setText(obj.getString("description"));
                     this.currentNode = obj.getString("id");
+                    final FloatingActionButton fab = (FloatingActionButton) getActivity().findViewById(R.id.button_claim);
+                    final MapFragment fragment = this;
+                    fab.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            ((MainActivity) getActivity()).scan(fragment);
+                        }
+                    });
                     break;
                 }
             } catch (JSONException e) {
                 e.printStackTrace();
             }
         }
+    }
+
+    public void scanResult(String result) {
+        requestManager.claimNode(currentNode, new JSONCallbackInterface() {
+            @Override
+            public void onJSONResponse(JSONObject obj) {
+                System.out.println(obj.toString());
+                final FloatingActionButton fab = (FloatingActionButton) getActivity().findViewById(R.id.button_claim);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    fab.setImageDrawable(getResources().getDrawable(R.drawable.ic_done, getActivity().getTheme()));
+                } else {
+                    fab.setImageDrawable(getResources().getDrawable(R.drawable.ic_done));
+                }
+            }
+        });
     }
 
     public void setUpRequestManager() {

@@ -18,8 +18,9 @@ import org.json.JSONObject;
  * Created by colander on 11/29/15.
  */
 public class RequestManager {
-    private String serverIP = "http://192.168.24.236:8081/";
-    private String mapRequest = "MAP";
+    private String serverIP = "http://192.168.24.213:8081/";
+    private String MAP_REQUEST = "MAP";
+    private String CLAIM_REQUEST = "CLAIM";
     private RequestQueue queue;
     public final static int NODES_ID = 1;
 
@@ -28,7 +29,7 @@ public class RequestManager {
     }
 
     public <T extends CallbackInterface> void getAllNodes(final T callback) {
-        StringRequest stringRequest = new StringRequest(Request.Method.GET, serverIP + mapRequest,
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, serverIP + MAP_REQUEST,
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
@@ -56,7 +57,7 @@ public class RequestManager {
     }
 
     public <T extends JSONArrayCallbackInterface> void getAllNodesJSON(final T callback) {
-        StringRequest stringRequest = new StringRequest(Request.Method.GET, serverIP + mapRequest,
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, serverIP + MAP_REQUEST,
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
@@ -83,14 +84,16 @@ public class RequestManager {
         JSONObject request = new JSONObject();
         try {
             request.put("token", AccountContainer.getAccount().getIdToken());
+            request.put("nodeID", id);
+            request.put("qr", "testQR");
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        JsonPostRequest(request, serverIP + mapRequest,callback);
+        JsonPostRequest(request, serverIP + CLAIM_REQUEST, callback);
     }
 
-    public <T extends JSONCallbackInterface> void JsonPostRequest(JSONObject jsonObject, String url, final T callback){
-        queue.add(new JsonObjectRequest(serverIP + mapRequest, jsonObject, new Response.Listener<JSONObject>() {
+    public <T extends JSONCallbackInterface> void JsonPostRequest(JSONObject jsonObject, String url, final T callback) {
+        queue.add(new JsonObjectRequest(url, jsonObject, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 System.out.println("JSON request successful");

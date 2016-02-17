@@ -6,7 +6,6 @@ function validate(token, callback) {
 	console.log(token)
 	https.get("https://www.googleapis.com/oauth2/v3/tokeninfo?id_token=" + token, function(res) {
 		res.on("data", function(data) {
-			//TODO: confirm id and respond
 			console.log("DATA: " + data)
 			var json = JSON.parse(data)
 			if (json.error_description == "Invalid Value") {

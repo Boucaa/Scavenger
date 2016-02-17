@@ -44,7 +44,15 @@ http.createServer(function(request, response) {
 			var jsonData = JSON.parse(data)
 			if (jsonData.token != undefined) {
 				validator.validate(jsonData.token, function(json) {
-
+					if (request.url == "/CLAIM") {
+						console.log("CLAIMING")
+						db.claimNode(json.email, jsonData.qr, jsonData.nodeID, function(result) {
+							if (result == "success") {
+								console.log("CLAIM SUCCESSFUL")
+								response.end("{\"result\":\"OK\"}")
+							}
+						})
+					}
 				})
 			} else {
 				console.log("POST request didn't contain auth token, request: \n" + request.url + "\n" + "data")
@@ -75,7 +83,7 @@ http.createServer(function(request, response) {
 			response.end("{\"result\":" + JSON.stringify(docs) + "}")
 		})
 
-	//TODO: popis, obrazky apod.
+		//TODO: popis, obrazky apod.
 	} else if (request.url.substring(0, NODE_REQUEST.length) == NODE_REQUEST) {
 		db.nodeByID(request.url.substring(NODE_REQUEST.length), function(err, doc) {
 			response.end(JSON.stringify(doc))
@@ -95,8 +103,8 @@ http.createServer(function(request, response) {
 		return
 	}
 	response.writeHead(200, {
-			'Content-Type': 'text/plain;charset=utf-8'
-		})
+		'Content-Type': 'text/plain;charset=utf-8'
+	})
 	console.log(request.url)
 }).listen(8081)
 

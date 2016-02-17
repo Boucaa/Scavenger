@@ -2,20 +2,15 @@ package com.colander.scavenger;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.android.volley.toolbox.Volley;
-import com.colander.scavenger.serverhandling.JSONCallbackInterface;
-import com.colander.scavenger.serverhandling.RequestManager;
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
@@ -29,11 +24,9 @@ import com.google.zxing.Result;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 
-import org.json.JSONObject;
-
 import me.dm7.barcodescanner.zxing.ZXingScannerView;
 
-public class MainActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener, ZXingScannerView.ResultHandler{
+public class MainActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener, ZXingScannerView.ResultHandler {
 
     private String[] drawerItemNames;
     private DrawerLayout drawerLayout;
@@ -42,6 +35,9 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
     GoogleApiClient mGoogleApiClient;
     GoogleSignInAccount userAccount;
     private int RC_SIGN_IN = 9001;
+    private int SCAN_CODE = 9002;
+
+    MapFragment mapFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,6 +70,9 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
             } else {
                 signIn();
             }
+        } else if (resultCode == ScanActivity.SCAN_CODE) {
+            System.out.println("EUREKA");
+            mapFragment.scanResult(intent.getExtras().getString("BARCODE"));
         } else {
             IntentResult scanningResult = IntentIntegrator.parseActivityResult(requestCode, resultCode, intent);
             if (scanningResult != null) {
@@ -130,6 +129,12 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
                 });
     }
 
+    public void scan(MapFragment fragment) {
+        this.mapFragment = fragment;
+        Intent i = new Intent(this, ScanActivity.class);
+        startActivityForResult(i, SCAN_CODE);
+    }
+
     @Override
     public void onConnectionFailed(ConnectionResult connectionResult) {
         System.out.println("API CONNECTION FAILED");
@@ -148,10 +153,9 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
 
     @Override
     public void handleResult(Result result) {
-
     }
 
-    public void onSuccessfulLogin(){
+    public void onSuccessfulLogin() {
         System.out.println("LOGIN SUCCESSFUL");
     }
 }
