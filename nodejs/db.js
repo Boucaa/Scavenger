@@ -104,6 +104,14 @@ function getMapNodes(callback) {
 	})
 }
 
+function purge() {
+/*	users.update({}, {
+		"$set": {
+			"nodes": []
+		}
+	})*/
+}
+
 MongoClient.connect("mongodb://localhost:27017/scavenger", function(err, database) {
 	db = database;
 	nodes = db.collection("nodes")
@@ -111,11 +119,11 @@ MongoClient.connect("mongodb://localhost:27017/scavenger", function(err, databas
 	if (!err) {
 		console.log("Databese connected")
 
-		getNodeByID("569138a0b2d4854947c48bd1", function(doc) {
+		/*getNodeByID("569138a0b2d4854947c48bd1", function(doc) {
 				console.dir(doc)
-			})
-			//add node: user, qr, lat, lng, headline, description
-			//addNode("testUser", "testQR", 50.08414, 14.40835, "Mimina na kampě", "Nějaký supr dupr popis mimin na kampě, určitě bych doporučil všem :). Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. ")
+			})*/
+		//add node: user, qr, lat, lng, headline, description
+		//addNode("testUser", "testQR", 50.08414, 14.40835, "Mimina na kampě", "Nějaký supr dupr popis mimin na kampě, určitě bych doporučil všem :). Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. ")
 
 		//	addUser("testUser","dawdaw","random idAWDAWD", "e.mail@email.com")
 
@@ -127,3 +135,4 @@ MongoClient.connect("mongodb://localhost:27017/scavenger", function(err, databas
 module.exports.getMapNodes = getMapNodes
 module.exports.getNodeByID = getNodeByID
 module.exports.claimNode = claimNode
+module.exports.purge = purge

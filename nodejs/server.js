@@ -12,7 +12,6 @@ var nextID = 0
 var TEST_REQUEST = "/TEST"
 var MAP_REQUEST = "/MAP"
 var NODE_REQUEST = "/NODE:"
-console.dir(db)
 
 //FS
 function write(data, address) {
@@ -44,14 +43,19 @@ http.createServer(function(request, response) {
 			var jsonData = JSON.parse(data)
 			if (jsonData.token != undefined) {
 				validator.validate(jsonData.token, function(json) {
-					if (request.url == "/CLAIM") {
-						console.log("CLAIMING")
-						db.claimNode(json.email, jsonData.qr, jsonData.nodeID, function(result) {
-							if (result == "success") {
-								console.log("CLAIM SUCCESSFUL")
-								response.end("{\"result\":\"OK\"}")
-							}
-						})
+					if (json != null) { //BUG: EXPIRED TOKEN SOMEHOW
+						if (request.url == "/CLAIM") {
+							console.log("CLAIMING")
+							db.claimNode(json.email, jsonData.qr, jsonData.nodeID, function(result) {
+								if (result == "success") {
+									console.log("CLAIM SUCCESSFUL")
+									response.end("{\"result\":\"OK\"}")
+								} else {
+									console.log("CLAMI UNSUCCESSFUL")
+									response.end("{\"result\":\"ERR\"}")
+								}
+							})
+						}
 					}
 				})
 			} else {
@@ -88,8 +92,8 @@ http.createServer(function(request, response) {
 		db.nodeByID(request.url.substring(NODE_REQUEST.length), function(err, doc) {
 			response.end(JSON.stringify(doc))
 		})
-	} else if (request.url == "QR_PDF") {
-		httpg.get('http://api.qrserver.com/v1/create-qr-code/?size=150x150&data=Example', 'img.png', function(error, result) {
+	} else if (request.url == "/QR_PDF") {
+		httpg.get('http://api.qrserver.com/v1/create-qr-code/?size=150x150&data=testQR', 'img.png', function(error, result) {
 			if (error) {
 				console.error(error)
 			} else {
@@ -109,3 +113,12 @@ http.createServer(function(request, response) {
 }).listen(8081)
 
 console.log('Server running at http://127.0.0.1:8081/')
+
+var stdin = process.openStdin()
+stdin.setEncoding('utf8');
+stdin.on('data', function(command) {
+	if (command == "purge\n") {
+		db.purge()
+		console.log("purging")
+	}
+})

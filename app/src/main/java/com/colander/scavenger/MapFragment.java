@@ -195,7 +195,7 @@ public class MapFragment extends android.support.v4.app.Fragment implements OnMa
     }
 
     public void scanResult(String result) {
-        requestManager.claimNode(currentNode, new JSONCallbackInterface() {
+        requestManager.claimNode(currentNode, result, new JSONCallbackInterface() {
             @Override
             public void onJSONResponse(JSONObject obj) {
                 System.out.println(obj.toString());

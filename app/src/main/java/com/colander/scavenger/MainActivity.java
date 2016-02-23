@@ -68,6 +68,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
                 System.out.println("hard login successful");
                 onSuccessfulLogin();
             } else {
+                Toast.makeText(this, "Login unsuccessful", Toast.LENGTH_LONG).show();
                 signIn();
             }
         } else if (resultCode == ScanActivity.SCAN_CODE) {
@@ -135,6 +136,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
         startActivityForResult(i, SCAN_CODE);
     }
 
+    //API SETUP ERROR
     @Override
     public void onConnectionFailed(ConnectionResult connectionResult) {
         System.out.println("API CONNECTION FAILED");
