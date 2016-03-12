@@ -44,6 +44,7 @@ public class ScanFragment extends android.support.v4.app.Fragment implements Vie
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        System.out.println("KEK");
     }
 
     @Override
@@ -52,9 +53,6 @@ public class ScanFragment extends android.support.v4.app.Fragment implements Vie
         Button scanButton = (Button) view.findViewById(R.id.scan_button);
         scanButton.setOnClickListener(this);
         return view;
-    }
-
-    public void onButtonPressed(Uri uri) {
     }
 
     @Override

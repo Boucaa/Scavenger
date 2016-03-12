@@ -2,7 +2,6 @@ package com.colander.scavenger;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -12,12 +11,15 @@ import android.os.Bundle;
 import android.app.Fragment;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.Volley;
@@ -59,6 +61,7 @@ public class MapFragment extends android.support.v4.app.Fragment implements OnMa
     private ImageLoader mImageLoader;
     private String currentNode = "";
     private View shadow;
+    final String TAG = "MapFragment";
 
     public static MapFragment newInstance() {
         MapFragment fragment = new MapFragment();
@@ -95,7 +98,8 @@ public class MapFragment extends android.support.v4.app.Fragment implements OnMa
                 }
             } else {
                 System.out.println("savedInstanceState didn't contain nodes");
-                requestManager.getAllNodesJSON(this);
+                //requestManager.getAllNodesJSON(this);
+                loadMap();
             }
         }
         bottomSheet = (BottomSheetLayout) view;
@@ -118,14 +122,15 @@ public class MapFragment extends android.support.v4.app.Fragment implements OnMa
     @Override
     public void onMapReady(GoogleMap googleMap) {
         System.out.println("MAP READY");
+        Log.d(TAG, "MAP READY");
         this.mMap = googleMap;
         mMap.setMyLocationEnabled(true);
-        if (nodes == null) this.requestManager.getAllNodesJSON(this);
+        if (nodes == null) loadMap();
         else displayNodes();
         Location location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
         LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
         CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(latLng, 15);
-        mMap.animateCamera(cameraUpdate);
+        mMap.moveCamera(cameraUpdate);
         mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
             @Override
             public boolean onMarkerClick(Marker marker) {
@@ -156,14 +161,15 @@ public class MapFragment extends android.support.v4.app.Fragment implements OnMa
                                 if (state == BottomSheetLayout.State.EXPANDED) {
                                     shadow.setBackground(ContextCompat.getDrawable(getContext(), R.drawable.solid_shadow));
                                     if (Build.VERSION.SDK_INT >= 21)
-                                        getActivity().getActionBar().setElevation(0);
+                                        ((AppCompatActivity)getActivity()).getSupportActionBar().setElevation(0);
                                 } else {
                                     shadow.setBackground(ContextCompat.getDrawable(getContext(), R.drawable.toolbar_dropshadow));
                                     if (Build.VERSION.SDK_INT >= 21)
-                                        getActivity().getActionBar().setElevation(4);
+                                        ((AppCompatActivity)getActivity()).getSupportActionBar().setElevation(4);
                                 }
                             }
                         });
+
                         (getActivity().findViewById(R.id.hide_node_button)).setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
@@ -179,6 +185,11 @@ public class MapFragment extends android.support.v4.app.Fragment implements OnMa
                     ((TextView) getActivity().findViewById(R.id.node_description)).setText(obj.getString("description"));
                     this.currentNode = obj.getString("id");
                     final FloatingActionButton fab = (FloatingActionButton) getActivity().findViewById(R.id.button_claim);
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                        fab.setImageDrawable(getResources().getDrawable(R.drawable.ic_explore, getActivity().getTheme()));
+                    } else {
+                        fab.setImageDrawable(getResources().getDrawable(R.drawable.ic_explore));
+                    }
                     final MapFragment fragment = this;
                     fab.setOnClickListener(new View.OnClickListener() {
                         @Override
@@ -199,11 +210,20 @@ public class MapFragment extends android.support.v4.app.Fragment implements OnMa
             @Override
             public void onJSONResponse(JSONObject obj) {
                 System.out.println(obj.toString());
-                final FloatingActionButton fab = (FloatingActionButton) getActivity().findViewById(R.id.button_claim);
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                    fab.setImageDrawable(getResources().getDrawable(R.drawable.ic_done, getActivity().getTheme()));
-                } else {
-                    fab.setImageDrawable(getResources().getDrawable(R.drawable.ic_done));
+                Log.d(TAG, "CLAIM RESULT " + obj.toString());
+                try {
+                    if (obj.getString("result").equals("OK")) {
+                        final FloatingActionButton fab = (FloatingActionButton) getActivity().findViewById(R.id.button_claim);
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                            fab.setImageDrawable(getResources().getDrawable(R.drawable.ic_done, getActivity().getTheme()));
+                        } else {
+                            fab.setImageDrawable(getResources().getDrawable(R.drawable.ic_done));
+                        }
+                    } else if (obj.getString("result").equals(RequestManager.NETWORK_ERROR)) {
+                        networkError();
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
                 }
             }
         });
@@ -237,6 +257,33 @@ public class MapFragment extends android.support.v4.app.Fragment implements OnMa
             this.nodes = array;
             displayNodes();
         }
+    }
+
+    public void loadMap() {
+        requestManager.getMap(new JSONCallbackInterface() {
+            @Override
+            public void onJSONResponse(JSONObject obj) {
+                System.out.println(obj.toString());
+                Log.d(TAG, obj.toString());
+                try {
+                    if (obj.getString("result").equals(RequestManager.NETWORK_ERROR)) {
+                        networkError();
+                    } else {
+                        Log.d(TAG, "GOT NODES");
+                        nodes = obj.getJSONArray("result");
+                        displayNodes();
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+    }
+
+    public void networkError() {
+        Toast toast = Toast.makeText(getContext(),
+                "Could not connect to the server.", Toast.LENGTH_SHORT);
+        toast.show();
     }
 
     @Override

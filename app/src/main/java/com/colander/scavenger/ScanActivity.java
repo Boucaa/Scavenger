@@ -19,6 +19,7 @@ public class ScanActivity extends AppCompatActivity implements ZXingScannerView.
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_FULLSCREEN);
         this.scannerView = new ZXingScannerView(this);
         scannerView.setResultHandler(this);
         setContentView(scannerView);

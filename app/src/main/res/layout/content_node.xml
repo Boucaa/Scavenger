@@ -8,45 +8,45 @@
 
     <View
         android:id="@+id/toolbar_shadow"
-        android:layout_alignParentTop="true"
         android:layout_width="match_parent"
         android:layout_height="5dp"
+        android:layout_alignParentTop="true"
         android:layout_below="@id/toolbar"
         android:background="@drawable/toolbar_dropshadow" />
 
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/node_toolbar"
-        android:layout_below="@+id/toolbar_shadow"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:background="@color/primary_black">
+        android:layout_below="@+id/toolbar_shadow"
+        android:background="@color/primary_black"
+        android:orientation="horizontal">
 
         <ImageButton
             android:id="@+id/hide_node_button"
-            android:padding="16dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="?android:selectableItemBackground"
+            android:padding="16dp"
             android:src="@drawable/ic_arrow_back"></ImageButton>
 
         <TextView
             android:id="@+id/node_headline"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:text="Node name"
-            android:textColor="#ffffff"
-            android:textSize="20sp"
+            android:layout_gravity="fill"
             android:paddingLeft="16dp"
             android:paddingTop="16dp"
-            android:layout_gravity="fill" />
+            android:text="Node name"
+            android:textColor="#ffffff"
+            android:textSize="20sp" />
     </LinearLayout>
 
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/content_node"
-        android:layout_below="@+id/node_toolbar"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_below="@+id/node_toolbar"
         android:background="@color/background_material_light"
         android:orientation="vertical">
 
@@ -66,8 +66,8 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="REVIEWS"
-            android:layout_margin="16dp"/>
+            android:layout_margin="16dp"
+            android:text="REVIEWS" />
     </LinearLayout>
 
     <android.support.design.widget.FloatingActionButton
@@ -76,7 +76,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
         android:layout_alignParentTop="true"
-        android:layout_marginTop="14dp"
         android:layout_marginRight="28dp"
+        android:layout_marginTop="14dp"
         android:src="@drawable/ic_explore" />
 </RelativeLayout>

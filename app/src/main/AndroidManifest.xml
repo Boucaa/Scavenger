@@ -49,10 +49,11 @@
         <activity
             android:name=".ScanActivity"
             android:label="@string/title_activity_scan"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
-        <activity android:name=".FullImageActivity"
+            android:theme="@style/NoActionBar"></activity>
+        <activity
+            android:name=".FullImageActivity"
             android:label="@string/app_name"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+            android:theme="@style/NoActionBar"></activity>
     </application>
 
 </manifest>

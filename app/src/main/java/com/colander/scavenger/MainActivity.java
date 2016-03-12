@@ -2,8 +2,11 @@ package com.colander.scavenger;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.design.widget.NavigationView;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ArrayAdapter;
@@ -43,12 +46,22 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        drawerItemNames = getResources().getStringArray(R.array.navigation_drawer_items);
+        this.setSupportActionBar((Toolbar) findViewById(R.id.toolbar));
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setHomeButtonEnabled(true);
+        drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+        ActionBarDrawerToggle drawerToggle = new ActionBarDrawerToggle(this, drawerLayout, (Toolbar) findViewById(R.id.toolbar), R.string.open, R.string.close);
+        drawerLayout.setDrawerListener(drawerToggle);
+        drawerToggle.syncState();
+        getSupportActionBar().setTitle("Scavenger");
+        ((NavigationView) findViewById(R.id.navigation_view)).setNavigationItemSelectedListener(new NavigationDrawerListener(this));
+
+        /*drawerItemNames = getResources().getStringArray(R.array.navigation_drawer_items);
         drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawerList = (ListView) findViewById(R.id.left_drawer);
         drawerList.setAdapter(new ArrayAdapter(this, R.layout.drawer_list_item, drawerItemNames));
         drawerList.setOnItemClickListener(new DrawerItemClickListener(drawerItemNames, drawerLayout, drawerList, getFragmentManager(), this));
-
+*/
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestEmail()
                 .requestIdToken(getString(R.string.server_client_id))
@@ -64,7 +77,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
         if (requestCode == RC_SIGN_IN) {
             GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(intent);
             if (result.getSignInAccount() != null) {
-                AccountContainer.setAccount(result.getSignInAccount());
+                AccountContainer.setGoogleAccount(result.getSignInAccount());
                 System.out.println("hard login successful");
                 onSuccessfulLogin();
             } else {
@@ -98,7 +111,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
         OptionalPendingResult<GoogleSignInResult> pendingResult = Auth.GoogleSignInApi.silentSignIn(mGoogleApiClient);
         if (pendingResult.isDone()) {
             System.out.println("silent login successful");
-            AccountContainer.setAccount(pendingResult.get().getSignInAccount());
+            AccountContainer.setGoogleAccount(pendingResult.get().getSignInAccount());
             onSuccessfulLogin();
         } else {
             pendingResult.setResultCallback(new ResultCallback<GoogleSignInResult>() {
@@ -109,7 +122,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
                         startActivityForResult(signInIntent, RC_SIGN_IN);
                     } else {
                         System.out.println("silent login successful");
-                        AccountContainer.setAccount(result.getSignInAccount());
+                        AccountContainer.setGoogleAccount(result.getSignInAccount());
                         onSuccessfulLogin();
                     }
                 }

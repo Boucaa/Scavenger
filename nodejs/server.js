@@ -44,7 +44,9 @@ http.createServer(function(request, response) {
 			if (jsonData.token != undefined) {
 				validator.validate(jsonData.token, function(json) {
 					if (json != null) { //BUG: EXPIRED TOKEN SOMEHOW
-						if (request.url == "/CLAIM") {
+						if (request.url == "/LOGIN") {
+
+						} else if (request.url == "/CLAIM") {
 							console.log("CLAIMING")
 							db.claimNode(json.email, jsonData.qr, jsonData.nodeID, function(result) {
 								if (result == "success") {
@@ -109,7 +111,6 @@ http.createServer(function(request, response) {
 	response.writeHead(200, {
 		'Content-Type': 'text/plain;charset=utf-8'
 	})
-	console.log(request.url)
 }).listen(8081)
 
 console.log('Server running at http://127.0.0.1:8081/')

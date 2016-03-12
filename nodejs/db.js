@@ -26,19 +26,31 @@ function nodesByUser(user, callback) {
 	})
 }
 
-function addUser(name, hash, GID, email) {
-	users.insert({
-		name: name,
-		hash: hash,
-		gID: GID,
-		email: mail,
-		nodes: []
-	}, {}, function(err, doc) {
-		console.log("NEW USER: " + name)
+function addUser(name, email) {
+	users.findOne({
+		"name": name
+	}, function(err, doc) {
+		if (doc == null) {
+			console.log("name unique")
+			users.findOne({
+				"email": email
+			}, function(err, doc) {
+				if (doc == null) {
+					users.insert({
+						name: name,
+						email: email,
+						nodes: []
+					}, {}, function(err, doc) {
+						if (!err) console.log("NEW USER: " + name)
+					})
+				}
+			})
+		}
 	})
+
 }
 
-function addNode(user, qr, lat, lng, headline, description) {
+function addNode(user, qr, lat, lng, headline, description, tags) {
 	nodes.insert({
 		user: user, //founder of the node
 		qr: qr, //the confirmation QR code
@@ -46,7 +58,8 @@ function addNode(user, qr, lat, lng, headline, description) {
 		lng: lng, //location lng
 		visitors: [],
 		headline: headline,
-		description: description
+		description: description,
+		tags: tags
 	}, {}, function(err, doc) {
 		if (err) {
 			console.log(err)
@@ -56,17 +69,18 @@ function addNode(user, qr, lat, lng, headline, description) {
 	})
 }
 
-function claimNode(user, qr, nodeID, callback) {
+function claimNode(email, qr, nodeID, callback) {
 	var node = getNodeByID(nodeID, function(doc) {
 		if (doc.qr == qr) {
 			console.log("QR OK")
 			users.update({
-				"name": user
+				"email": email
 			}, {
-				"$push": {
+				"$addToSet": {
 					"nodes": nodeID
 				}
 			})
+			nodes.update({})
 			callback("success")
 		}
 	})
@@ -105,11 +119,11 @@ function getMapNodes(callback) {
 }
 
 function purge() {
-/*	users.update({}, {
+	users.update({}, {
 		"$set": {
 			"nodes": []
 		}
-	})*/
+	})
 }
 
 MongoClient.connect("mongodb://localhost:27017/scavenger", function(err, database) {
@@ -118,12 +132,12 @@ MongoClient.connect("mongodb://localhost:27017/scavenger", function(err, databas
 	users = db.collection("users")
 	if (!err) {
 		console.log("Databese connected")
-
-		/*getNodeByID("569138a0b2d4854947c48bd1", function(doc) {
-				console.dir(doc)
-			})*/
-		//add node: user, qr, lat, lng, headline, description
-		//addNode("testUser", "testQR", 50.08414, 14.40835, "Mimina na kampě", "Nějaký supr dupr popis mimin na kampě, určitě bych doporučil všem :). Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. ")
+		addUser("Colander", "jan.boucek.lol@gmail.comm")
+			/*getNodeByID("569138a0b2d4854947c48bd1", function(doc) {
+					console.dir(doc)
+				})*/
+			//add node: user, qr, lat, lng, headline, description
+			//addNode("testUser", "testQR", 50.08414, 14.40835, "Mimina na kampě", "Nějaký supr dupr popis mimin na kampě, určitě bych doporučil všem :). Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. ")
 
 		//	addUser("testUser","dawdaw","random idAWDAWD", "e.mail@email.com")
 
