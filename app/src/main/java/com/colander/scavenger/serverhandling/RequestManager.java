@@ -17,7 +17,7 @@ import org.json.JSONObject;
  * Created by colander on 11/29/15.
  */
 public class RequestManager {
-    private String serverIP = "http://10.0.0.38:8081/";
+    private String serverIP = "http://192.168.24.252:8081/";
     private String MAP_REQUEST = "MAP";
     private String CLAIM_REQUEST = "CLAIM";
     private RequestQueue queue;
@@ -29,29 +29,6 @@ public class RequestManager {
     public RequestManager(RequestQueue queue) {
         this.queue = queue;
     }
-
-    /*public <T extends JSONArrayCallbackInterface> void getAllNodesJSON(final T callback) {
-        StringRequest stringRequest = new StringRequest(Request.Method.GET, serverIP + MAP_REQUEST,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-                        System.out.println("GOT RESPONSE");
-                        try {
-                            JSONArray json = new JSONObject(response).getJSONArray("result");
-                            callback.onJSONResponse(json, NODES_ID);
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                System.out.println("REQUEST ERROR" + error.getMessage());
-
-            }
-        });
-        queue.add(stringRequest);
-    }*/
 
     public <T extends JSONCallbackInterface> void claimNode(String id, String qr, final T callback) {
         System.out.printf("JSON request sent");

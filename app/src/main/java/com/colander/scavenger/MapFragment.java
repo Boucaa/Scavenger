@@ -2,6 +2,8 @@ package com.colander.scavenger;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -11,6 +13,7 @@ import android.os.Bundle;
 import android.app.Fragment;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -62,6 +65,7 @@ public class MapFragment extends android.support.v4.app.Fragment implements OnMa
     private String currentNode = "";
     private View shadow;
     final String TAG = "MapFragment";
+    final int DIST_NAVIGATION_LIMIT = 250;
 
     public static MapFragment newInstance() {
         MapFragment fragment = new MapFragment();
@@ -161,11 +165,11 @@ public class MapFragment extends android.support.v4.app.Fragment implements OnMa
                                 if (state == BottomSheetLayout.State.EXPANDED) {
                                     shadow.setBackground(ContextCompat.getDrawable(getContext(), R.drawable.solid_shadow));
                                     if (Build.VERSION.SDK_INT >= 21)
-                                        ((AppCompatActivity)getActivity()).getSupportActionBar().setElevation(0);
+                                        ((AppCompatActivity) getActivity()).getSupportActionBar().setElevation(0);
                                 } else {
                                     shadow.setBackground(ContextCompat.getDrawable(getContext(), R.drawable.toolbar_dropshadow));
                                     if (Build.VERSION.SDK_INT >= 21)
-                                        ((AppCompatActivity)getActivity()).getSupportActionBar().setElevation(4);
+                                        ((AppCompatActivity) getActivity()).getSupportActionBar().setElevation(4);
                                 }
                             }
                         });
@@ -194,7 +198,37 @@ public class MapFragment extends android.support.v4.app.Fragment implements OnMa
                     fab.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            ((MainActivity) getActivity()).scan(fragment);
+                            try {
+                                Location location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+                                final Location nodeLocation = new Location("node");
+                                nodeLocation.setLatitude(obj.getDouble("lat"));
+                                nodeLocation.setLongitude(obj.getDouble("lng"));
+                                System.out.println(location.distanceTo(nodeLocation));
+                                if (location.distanceTo(nodeLocation) > DIST_NAVIGATION_LIMIT) {
+                                    new AlertDialog.Builder(getContext())
+                                            .setTitle("Too far")
+                                            .setMessage("Do you wan to get directions?")
+                                            .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                                                public void onClick(DialogInterface dialog, int which) {
+                                                    Intent intent = new Intent(android.content.Intent.ACTION_VIEW,
+                                                            Uri.parse("http://maps.google.com/maps?daddr=" + nodeLocation.getLatitude() + "," + nodeLocation.getLongitude()));
+                                                    startActivity(intent);
+                                                }
+                                            })
+                                            .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                                                public void onClick(DialogInterface dialog, int which) {
+                                                    // do nothing
+                                                }
+                                            })
+                                            .show();
+                                } else {
+                                    ((MainActivity) getActivity()).scan(fragment);
+                                }
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+
+
                         }
                     });
                     break;
@@ -281,6 +315,8 @@ public class MapFragment extends android.support.v4.app.Fragment implements OnMa
     }
 
     public void networkError() {
+        Context ctx = getContext();
+        if (ctx == null) return;
         Toast toast = Toast.makeText(getContext(),
                 "Could not connect to the server.", Toast.LENGTH_SHORT);
         toast.show();

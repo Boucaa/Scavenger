@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-    <item
-        android:id="@+id/nav0"
-        android:icon="@drawable/ic_explore"
-        android:title="@string/nav0" />
-    <item
-        android:id="@+id/nav1"
-        android:icon="@drawable/ic_explore"
-        android:title="@string/nav1" />
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav0"
+            android:icon="@drawable/ic_explore"
+            android:title="@string/nav0" />
+        <item
+            android:id="@+id/nav1"
+            android:icon="@drawable/ic_explore"
+            android:title="@string/nav1" />
+    </group>
 </menu>

@@ -22,12 +22,14 @@ public class NavigationDrawerListener implements NavigationView.OnNavigationItem
         this.drawerLayout = (DrawerLayout) activity.findViewById(R.id.drawer_layout);
         this.menu = ((NavigationView) activity.findViewById(R.id.navigation_view)).getMenu();
         this.fragments = new Fragment[menu.size()];
+        selectItem(0);
+        menu.getItem(0).setChecked(true);
     }
 
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         for (int i = 0; i < menu.size(); i++) {
-            item.setChecked(false);
+            menu.getItem(i).setChecked(false);
             if (item == menu.getItem(i)) {
                 selectItem(i);
             }

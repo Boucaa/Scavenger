@@ -18,5 +18,8 @@
     <string name="server_client_id">25013689568-5p2g0ett1o784rddou1qpcnjgae5f8l8.apps.googleusercontent.com</string>
     <string name="title_activity_sign_in">SignInActivity</string>
     <string name="title_activity_scan">ScanActivity</string>
+    <string name="map_navigation_alert">You are too far away, do you want to get directions?</string>
+    <string name="ok">OK</string>
+    <string name="cancel">cancel</string>
 
 </resources>

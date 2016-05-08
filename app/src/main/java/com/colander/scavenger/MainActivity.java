@@ -9,11 +9,13 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.ArrayAdapter;
-import android.widget.ListView;
+import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.toolbox.ImageLoader;
+import com.android.volley.toolbox.NetworkImageView;
+import com.android.volley.toolbox.Volley;
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
@@ -31,10 +33,8 @@ import me.dm7.barcodescanner.zxing.ZXingScannerView;
 
 public class MainActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener, ZXingScannerView.ResultHandler {
 
-    private String[] drawerItemNames;
     private DrawerLayout drawerLayout;
-    private ListView drawerList;
-
+    private ImageLoader imageLoader;
     GoogleApiClient mGoogleApiClient;
     GoogleSignInAccount userAccount;
     private int RC_SIGN_IN = 9001;
@@ -54,14 +54,23 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
         drawerLayout.setDrawerListener(drawerToggle);
         drawerToggle.syncState();
         getSupportActionBar().setTitle("Scavenger");
-        ((NavigationView) findViewById(R.id.navigation_view)).setNavigationItemSelectedListener(new NavigationDrawerListener(this));
+        final NavigationView navigationView = (NavigationView) findViewById(R.id.navigation_view);
+        navigationView.setNavigationItemSelectedListener(new NavigationDrawerListener(this));
+        navigationView.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
+            @Override
+            public void onLayoutChange(View v, int left, int top, int right, int bottom, int oldLeft, int oldTop, int oldRight, int oldBottom) {
+                NetworkImageView networkImageView = (NetworkImageView) findViewById(R.id.user_portrait);
+                if (AccountContainer.getGoogleAccount() != null) {
+                    networkImageView.setImageUrl(AccountContainer.getGoogleAccount().getPhotoUrl().toString(), imageLoader);
+                    navigationView.removeOnLayoutChangeListener(this);
+                }
 
-        /*drawerItemNames = getResources().getStringArray(R.array.navigation_drawer_items);
-        drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
-        drawerList = (ListView) findViewById(R.id.left_drawer);
-        drawerList.setAdapter(new ArrayAdapter(this, R.layout.drawer_list_item, drawerItemNames));
-        drawerList.setOnItemClickListener(new DrawerItemClickListener(drawerItemNames, drawerLayout, drawerList, getFragmentManager(), this));
-*/
+            }
+        });
+
+        ImageLoader.ImageCache imageCache = new BitmapLruCache();
+        imageLoader = new ImageLoader(Volley.newRequestQueue(this), imageCache);
+        System.out.println(imageLoader + " " + imageCache);
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestEmail()
                 .requestIdToken(getString(R.string.server_client_id))
@@ -71,6 +80,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
                 .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
                 .build();
         signIn();
+
     }
 
     public void onActivityResult(int requestCode, int resultCode, Intent intent) {
@@ -172,5 +182,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
 
     public void onSuccessfulLogin() {
         System.out.println("LOGIN SUCCESSFUL");
+        NetworkImageView networkImageView = (NetworkImageView) findViewById(R.id.user_portrait);
+        //((NetworkImageView) findViewById(R.id.user_portrait)).setImageUrl(AccountContainer.getGoogleAccount().getPhotoUrl().toString(), imageLoader);
     }
 }
